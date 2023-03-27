@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzn.mapper.UserAdminMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzn.pojo.user.admin.UserAdmin">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="aId" column="a_id" jdbcType="VARCHAR"/>
+        <result property="aName" column="a_name" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="TINYINT"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="phone" column="phone" jdbcType="CHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP"/>
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
+        <result property="userType" column="user_type" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <resultMap id="DictResultMap" type="com.zzn.pojo.user.admin.UserAdminWithDict">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="aId" column="a_id" jdbcType="VARCHAR"/>
+        <result property="aName" column="a_name" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="TINYINT"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="phone" column="phone" jdbcType="CHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP"/>
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
+        <result property="userType" column="user_type" jdbcType="TINYINT"/>
+        <association property="dictCollege" javaType="com.zzn.pojo.dict.DictCollege">
+            <result property="college" column="cCollege"/>
+            <result property="description" column="cDescription"/>
+        </association>
+        <association property="dictGender" javaType="com.zzn.pojo.dict.DictGender">
+            <result property="gender" column="gGender"/>
+            <result property="description" column="gDescription"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        a_id,
+        a_name,
+        gender,
+        password,
+        college,
+        phone,
+        email,
+        login_time,
+        login_ip,
+        user_type
+    </sql>
+
+    <sql id="dict_sql">
+        SELECT
+            id,
+            a_id,
+            a_name,
+            a.gender ,
+            `password`,
+            a.college ,
+            phone,
+            email,
+            login_time,
+            login_ip,
+            user_type,
+            g.gender AS gGender,
+            g.description AS gDescription,
+            c.college AS cCollege,
+            c.description AS cDescription
+        FROM
+            user_admin a,
+            dict_college c,
+            dict_gender g
+        WHERE
+            a.college = c.college
+          AND a.gender = g.gender
+    </sql>
+    <select id="getOneByAId" resultMap="DictResultMap">
+        <include refid="dict_sql"/>
+        and a.a_id=#{aId}
+    </select>
+    <select id="getOneByAIdAndPassword" resultMap="DictResultMap">
+        <include refid="dict_sql"/>
+        and a.a_id=#{aId}
+        and a.password=#{password}
+    </select>
+
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzn.mapper.DictMajorMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzn.pojo.dict.DictMajor">
+            <id property="major" column="major" jdbcType="CHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="college" column="college" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        major,description,college
+    </sql>
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzn.mapper.TopicMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzn.pojo.topic.Topic">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="topicName" column="topic_name" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="TINYINT"/>
+        <result property="source" column="source" jdbcType="TINYINT"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="year" column="year" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="checkedBy" column="checked_by" jdbcType="VARCHAR"/>
+        <result property="checkSuggestions" column="check_suggestions" jdbcType="VARCHAR"/>
+        <result property="checkedTime" column="checked_time" jdbcType="TIMESTAMP"/>
+        <result property="checked" column="checked" jdbcType="TINYINT"/>
+        <result property="passed" column="passed" jdbcType="TINYINT"/>
+        <result property="selectedBy" column="selected_by" jdbcType="VARCHAR"/>
+        <result property="selected" column="selected" jdbcType="TINYINT"/>
+        <result property="deleted" column="deleted" jdbcType="TINYINT"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="DictResultMap" type="com.zzn.pojo.topic.TopicWithDict">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="topicName" column="topic_name" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="TINYINT"/>
+        <result property="createdName" column="created_name" jdbcType="VARCHAR"/>
+        <result property="checkedName" column="checked_name" jdbcType="VARCHAR"/>
+        <result property="source" column="source" jdbcType="TINYINT"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="year" column="year" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="checkedBy" column="checked_by" jdbcType="VARCHAR"/>
+        <result property="checkSuggestions" column="check_suggestions" jdbcType="VARCHAR"/>
+        <result property="checkedTime" column="checked_time" jdbcType="TIMESTAMP"/>
+        <result property="checked" column="checked" jdbcType="TINYINT"/>
+        <result property="passed" column="passed" jdbcType="TINYINT"/>
+        <result property="selectedBy" column="selected_by" jdbcType="VARCHAR"/>
+        <result property="selectedName" column="selected_name" jdbcType="VARCHAR"/>
+        <result property="selected" column="selected" jdbcType="TINYINT"/>
+        <association property="dictCollege" javaType="com.zzn.pojo.dict.DictCollege">
+            <result property="college" column="cCollege"/>
+            <result property="description" column="cDescription"/>
+        </association>
+
+        <association property="dictMajor" javaType="com.zzn.pojo.dict.DictMajor">
+            <result property="major" column="mMajor"/>
+            <result property="description" column="mDescription"/>
+        </association>
+        <association property="dictTopicType" javaType="com.zzn.pojo.dict.DictTopicType">
+            <result property="type" column="tyType"/>
+            <result property="description" column="tyDescription"/>
+        </association>
+        <association property="dictTopicSource" javaType="com.zzn.pojo.dict.DictTopicSource">
+            <result property="source" column="sSource"/>
+            <result property="description" column="sDescription"/>
+        </association>
+        <association property="dictTopicPassed" javaType="com.zzn.pojo.dict.DictTopicPassed">
+            <result property="passed" column="pPassed"/>
+            <result property="description" column="pDescription"/>
+        </association>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,topic_name,type,
+        source,college,major,
+        year,created_by,created_time,
+        updated_by,updated_time,checked_by,
+        check_suggestions,checked_time,checked,
+        passed,selected_by,selected,
+        deleted,version
+    </sql>
+    <sql id="Dict_Sql">
+        SELECT id,
+               topic_name,
+               t.type,
+               t.source,
+               t.college,
+               t.major,
+               `year`,
+               created_by,
+               created_name,
+               created_time,
+               updated_by,
+               updated_time,
+               checked_by,
+               checked_name,
+               check_suggestions,
+               checked_time,
+               checked,
+               t.passed,
+               selected_name,
+               selected_by,
+               selected,
+               c.college      AS cCollege,
+               c.description  AS cDescription,
+               m.major        AS mMajor,
+               m.description  AS mDescription,
+               s.source       AS sSource,
+               s.description  AS sDescription,
+               ty.type        AS tyType,
+               ty.description AS TyDescription,
+               p.passed       AS pPassed,
+               p.description  AS pDescription
+        FROM topic t,
+             dict_college c,
+             dict_major m,
+             dict_topic_type ty,
+             dict_topic_passed p,
+             dict_topic_source s
+        WHERE t.college = c.college
+          AND t.major = m.major
+          AND t.type = ty.type
+          AND t.passed = p.passed
+          AND t.source = s.source
+          AND t.deleted = 1
+    </sql>
+    <select id="listByTid" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.created_by=#{tId}
+    </select>
+    <select id="getBySid" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.selected_by=#{sId}
+    </select>
+    <select id="pageByCollege" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.college=#{college}
+        and t.year=#{year}
+        ORDER BY id
+        limit #{start},#{size}
+    </select>
+    <select id="pageByMajorWithChecked" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.major=#{major}
+        and t.year=#{year}
+        and t.checked=0
+        and t.selected=1
+        and t.passed=2
+        ORDER BY id
+        limit #{start},#{size}
+    </select>
+    <select id="pageByCollegeWithUnCheck" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.college=#{college}
+        and t.year=#{year}
+        and t.checked=1
+        ORDER BY id
+        limit #{start},#{size}
+    </select>
+
+</mapper>

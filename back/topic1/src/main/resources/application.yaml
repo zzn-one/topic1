@@ -1,0 +1,38 @@
+server:
+  port: 9000
+spring:
+#  mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: mysql8
+    url: jdbc:mysql://localhost:3306/topic
+#    redis
+  redis:
+    host: 1.12.54.183
+    password: redis7
+    lettuce:
+      pool:
+        max-active: 8            #最大连接数
+        max-idle: 8                #最大空闲连接
+        min-idle: 0                #最小空闲连接
+        max-wait: 10000ms        #最大连接等待时间
+    database: 1
+#    mq
+  rabbitmq:
+    port: 5672
+    host: 1.12.54.183
+    username: root
+    password: rabbitmq
+    virtual-host: /topic1
+#    mp
+mybatis-plus:
+  global-config:
+    db-config:
+      # 逻辑删除字段名
+      logic-delete-field: deleted
+      # 逻辑删除字面值：未删除为1
+      logic-not-delete-value: 1
+      # 逻辑删除字面值：删除为0
+      logic-delete-value: 0
+

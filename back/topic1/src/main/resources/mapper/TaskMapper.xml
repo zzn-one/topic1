@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzn.mapper.TaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzn.pojo.task.Task">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="year" column="year" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="duration" column="duration" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="publishBy" column="publish_by" jdbcType="VARCHAR"/>
+        <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="DictResultMap" type="com.zzn.pojo.task.TaskWithDict">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="year" column="year" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="duration" column="duration" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="publishBy" column="publish_by" jdbcType="VARCHAR"/>
+        <result property="publishName" column="publish_name" jdbcType="VARCHAR"/>
+        <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
+        <association property="dictCollege" javaType="com.zzn.pojo.dict.DictCollege">
+            <result property="college" column="cCollege"/>
+            <result property="description" column="cDescription"/>
+        </association>
+        <association property="dictMajor" javaType="com.zzn.pojo.dict.DictMajor">
+            <result property="major" column="mMajor"/>
+            <result property="description" column="mDescription"/>
+        </association>
+        <association property="dictTaskStatus" javaType="com.zzn.pojo.dict.DictTaskStatus">
+            <result property="status" column="sStatus"/>
+            <result property="description" column="sDescription"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,name,college,
+        major,year,start_time,
+        duration,status,publish_by,
+        publish_time,version
+    </sql>
+
+    <sql id="Dict_sql">
+        SELECT id,
+               `name`,
+               t.college,
+               t.major,
+               `year`,
+               start_time,
+               duration,
+               t.`status`,
+               publish_by,
+               publish_name,
+               publish_time,
+               c.college     as cCollege,
+               c.description as cDescription,
+               m.major       as mMajor,
+               m.description as mDescription,
+               s.`status`    as sStatus,
+               s.description as sDescription
+
+        FROM task t,
+             dict_college c,
+             dict_major m,
+             dict_task_status s
+
+        WHERE t.college = c.college
+          AND t.major = m.major
+          AND t.`status` = s.`status`
+    </sql>
+
+    <select id="getByMajorAndYear" resultMap="DictResultMap">
+        <include refid="Dict_sql"/>
+        and t.major=#{major}
+        and t.year=#{year}
+        and (t.status=0 or t.status=1)
+    </select>
+    <select id="listByCollegeAndYear" resultMap="DictResultMap">
+        <include refid="Dict_sql"/>
+        and t.college=#{college}
+        and t.year=#{year}
+    </select>
+    <select id="getById" resultMap="DictResultMap">
+        <include refid="Dict_sql"/>
+        and t.id=#{id}
+    </select>
+
+</mapper>

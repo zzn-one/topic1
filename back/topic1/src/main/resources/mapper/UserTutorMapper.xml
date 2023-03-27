@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzn.mapper.UserTutorMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzn.pojo.user.tutor.UserTutor">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="tId" column="t_id" jdbcType="VARCHAR"/>
+        <result property="tutorName" column="tutor_name" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="TINYINT"/>
+        <result property="gender" column="gender" jdbcType="TINYINT"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="phone" column="phone" jdbcType="CHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="office" column="office" jdbcType="VARCHAR"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP"/>
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+        <result property="deleted" column="deleted" jdbcType="TINYINT"/>
+        <result property="userType" column="user_type" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <resultMap id="DictResultMap" type="com.zzn.pojo.user.tutor.UserTutorWithDict">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="tId" column="t_id" jdbcType="VARCHAR"/>
+        <result property="tutorName" column="tutor_name" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="TINYINT"/>
+        <result property="gender" column="gender" jdbcType="TINYINT"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="college" column="college" jdbcType="CHAR"/>
+        <result property="major" column="major" jdbcType="CHAR"/>
+        <result property="phone" column="phone" jdbcType="CHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="office" column="office" jdbcType="VARCHAR"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP"/>
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
+        <result property="userType" column="user_type" jdbcType="TINYINT"/>
+        <association property="dictCollege" javaType="com.zzn.pojo.dict.DictCollege">
+            <result property="college" column="cCollege"/>
+            <result property="description" column="cDescription"/>
+        </association>
+        <association property="dictGender" javaType="com.zzn.pojo.dict.DictGender">
+            <result property="gender" column="gGender"/>
+            <result property="description" column="gDescription"/>
+        </association>
+        <association property="dictMajor" javaType="com.zzn.pojo.dict.DictMajor">
+            <result property="major" column="mMajor"/>
+            <result property="description" column="mDescription"/>
+        </association>
+        <association property="dictTutorTitle" javaType="com.zzn.pojo.dict.DictTutorTitle">
+            <result property="title" column="ttTitle"/>
+            <result property="description" column="ttDescription"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,t_id,tutor_name,
+        title,gender,password,
+        college,major,phone,
+        email,office,updated_by,
+        updated_time,login_time,login_ip,
+        version,deleted,user_type
+    </sql>
+    <sql id="Dict_Sql">
+        SELECT id,
+               t_id,
+               tutor_name,
+               t.title,
+               t.gender,
+               `password`,
+               t.college,
+               t.major,
+               phone,
+               email,
+               office,
+               updated_by,
+               updated_time,
+               login_time,
+               login_ip,
+               user_type,
+               c.college      AS cCollege,
+               c.description  AS cDescription,
+               m.major        AS mMajor,
+               m.description  AS mDescription,
+               g.gender       AS gGender,
+               g.description  AS gDescription,
+               tt.title       AS ttTitle,
+               tt.description AS ttDescription
+        FROM user_tutor t,
+             dict_college c,
+             dict_major m,
+             dict_gender g,
+             dict_tutor_title tt
+
+        WHERE t.college = c.college
+          AND t.major = m.major
+          AND t.gender = g.gender
+          AND t.title = tt.title
+          AND t.deleted = 1
+    </sql>
+    <select id="getOneByTidAndPassword" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.t_id=#{account}
+        and t.password=#{password}
+    </select>
+    <select id="getOneByTid" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.t_id=#{tId}
+    </select>
+    <select id="pageByCondition" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.college=#{college}
+
+        <if test="tId!=null and tId!=''">
+            and t.t_id like concat(#{tId},'%')
+        </if>
+
+        <if test="tutorName!=null and tutorName!=''">
+            and t.tutor_name like concat('%',#{tutorName},'%')
+        </if>
+
+        <if test="major!=null and major!=''">
+            and t.major = #{major}
+        </if>
+        ORDER BY id
+        limit #{start},#{size}
+    </select>
+
+    <select id="listByCollege" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.college=#{college}
+        ORDER BY id
+    </select>
+
+    <select id="exportMsgByCondition" resultMap="DictResultMap">
+        <include refid="Dict_Sql"/>
+        and t.college=#{college}
+        <if test="major!=null and major!='' ">
+            and t.major = #{major}
+        </if>
+        limit 0,#{number}
+    </select>
+
+    <select id="getStudentByTid" resultType="com.zzn.pojo.user.tutor.TutorStudent">
+        SELECT
+            topic_name,
+            s_name,
+            s_id,
+            phone,
+            email,
+            dt.description AS td,
+            ds.description AS sd
+        FROM
+            topic t,
+            user_student s,
+            dict_topic_type dt,
+            dict_topic_source ds
+        WHERE
+                t.selected_by IN (
+                SELECT
+                    s_id
+                FROM
+                    user_student
+                WHERE
+                        s_id IN ( SELECT DISTINCT selected_by FROM topic WHERE created_by = #{tid} AND selected_by IS NOT NULL ))
+          AND t.type = dt.type
+          AND t.source = ds.source
+          AND s.s_id = t.selected_by
+    </select>
+
+</mapper>
